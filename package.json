@@ -1,0 +1,48 @@
+{
+  "name": "winston-newrelic-agent-transport",
+  "version": "0.1.0",
+  "description": "A Winston transport using the New Relic agent.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "author": "Gregory Kim <gkim@kimnetics.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kimnetics/winston-newrelic-agent-transport.git"
+  },
+  "keywords": [
+    "newrelic",
+    "winston"
+  ],
+  "bugs": {
+    "url": "https://github.com/kimnetics/winston-newrelic-agent-transport/issues"
+  },
+  "homepage": "https://github.com/kimnetics/winston-newrelic-agent-transport#readme",
+  "dependencies": {
+    "newrelic": "latest",
+    "triple-beam": "^1.4.1",
+    "winston-transport": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/newrelic": "^9.14.3",
+    "chai": "^4.3.10",
+    "eslint": "^8.56.0",
+    "eslint-config-standard-with-typescript": "^40.0.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.4.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.2",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "build": "tsup",
+    "lint": "eslint . --ext .ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "license": "MIT"
+}
