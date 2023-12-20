@@ -176,69 +176,69 @@ describe('NewrelicTransport', () => {
       expect(result).to.equal(false)
     })
 
-    it('should return true when all rejectCriteria match the message string', () => {
-      const transport = new NewrelicTransport()
-      const info = {}
-      const message = 'test message'
-      const rejectCriteria = [
-        { property: null, regex: 'test' },
-        { property: null, regex: 'message' }
-      ]
-
-      const result = transport.reject(info, message, rejectCriteria)
-      expect(result).to.equal(true)
-    })
-
-    it('should return true when all rejectCriteria match the value of the specified property in the info object', () => {
-      const transport = new NewrelicTransport()
-      const info = { property: 'test property' }
-      const message = ''
-      const rejectCriteria = [
-        { property: 'property', regex: 'test' },
-        { property: 'property', regex: 'property' }
-      ]
-
-      const result = transport.reject(info, message, rejectCriteria)
-      expect(result).to.equal(true)
-    })
-
-    it('should return false if any rejectCriteria do not match the message string', () => {
+    it('should return true when any rejectCriteria match the message string', () => {
       const transport = new NewrelicTransport()
       const info = {}
       const message = 'test message'
 
       let rejectCriteria = [
-        { property: null, regex: 'nomatch' },
-        { property: null, regex: 'message' }
-      ]
-      let result = transport.reject(info, message, rejectCriteria)
-      expect(result).to.equal(false)
-
-      rejectCriteria = [
         { property: null, regex: 'test' },
         { property: null, regex: 'nomatch' }
       ]
+      let result = transport.reject(info, message, rejectCriteria)
+      expect(result).to.equal(true)
+
+      rejectCriteria = [
+        { property: null, regex: 'nomatch' },
+        { property: null, regex: 'message' }
+      ]
       result = transport.reject(info, message, rejectCriteria)
-      expect(result).to.equal(false)
+      expect(result).to.equal(true)
     })
 
-    it('should return false if any rejectCriteria do not match the value of the specified property in the info object', () => {
+    it('should return true when any rejectCriteria match the value of the specified property in the info object', () => {
       const transport = new NewrelicTransport()
       const info = { property: 'test property' }
       const message = ''
 
       let rejectCriteria = [
-        { property: 'property', regex: 'nomatch' },
-        { property: 'property', regex: 'property' }
-      ]
-      let result = transport.reject(info, message, rejectCriteria)
-      expect(result).to.equal(false)
-
-      rejectCriteria = [
         { property: 'property', regex: 'test' },
         { property: 'property', regex: 'nomatch' }
       ]
+      let result = transport.reject(info, message, rejectCriteria)
+      expect(result).to.equal(true)
+
+      rejectCriteria = [
+        { property: 'property', regex: 'nomatch' },
+        { property: 'property', regex: 'property' }
+      ]
       result = transport.reject(info, message, rejectCriteria)
+      expect(result).to.equal(true)
+    })
+
+    it('should return false if all rejectCriteria do not match the message string', () => {
+      const transport = new NewrelicTransport()
+      const info = {}
+      const message = 'test message'
+
+      const rejectCriteria = [
+        { property: null, regex: 'nomatch1' },
+        { property: null, regex: 'nomatch2' }
+      ]
+      const result = transport.reject(info, message, rejectCriteria)
+      expect(result).to.equal(false)
+    })
+
+    it('should return false if all rejectCriteria do not match the value of the specified property in the info object', () => {
+      const transport = new NewrelicTransport()
+      const info = { property: 'test property' }
+      const message = ''
+
+      const rejectCriteria = [
+        { property: 'property', regex: 'nomatch1' },
+        { property: 'property', regex: 'nomatch2' }
+      ]
+      const result = transport.reject(info, message, rejectCriteria)
       expect(result).to.equal(false)
     })
   })

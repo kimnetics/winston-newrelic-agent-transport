@@ -60,12 +60,12 @@ export default class NewrelicTransport extends Transport {
         return false
       }
 
-      if (value.match(item.regex) === null) {
-        return false
+      if (value.match(item.regex) !== null) {
+        return true
       }
     }
 
-    return true
+    return false
   }
 
   getValue (info: Record<string, any>, property: string): Record<string, any> | string | undefined {
