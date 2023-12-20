@@ -3,7 +3,7 @@ import { LEVEL, MESSAGE } from 'triple-beam'
 import Transport, { type TransportStreamOptions } from 'winston-transport'
 
 export default class NewrelicTransport extends Transport {
-  private readonly name: string
+  public readonly name: string
 
   constructor (options: TransportStreamOptions = {}) {
     super(options)
@@ -17,14 +17,10 @@ export default class NewrelicTransport extends Transport {
     })
 
     try {
-      // Send log entry to New Relic unless message is from Amazon Lightsail health check.
-      const userAgent = info?.metadata?.headers?.['user-agent'] as string | undefined
-      if ((userAgent === undefined) || (!userAgent.startsWith('ELB-HealthChecker'))) {
-        newrelic.recordLogEvent({
-          message: info[MESSAGE],
-          level: info[LEVEL]
-        })
-      }
+      newrelic.recordLogEvent({
+        message: info[MESSAGE],
+        level: info[LEVEL]
+      })
     } catch (err) {
     } finally {
       callback()
