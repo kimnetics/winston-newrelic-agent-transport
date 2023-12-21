@@ -73,4 +73,8 @@ A hosting provider was sending many health checks to our site and we wished to e
 
 ## Notes
 
-Code uses the [JavaScript Standard Style](https://standardjs.com) and may be checked with `npm run lint`.
+I found that using the agent recordLogEvent method to log events also adds the New Relic context to the log. It is not necessary to add `application_logging.local_decorating.enabled: true` to your New Relic config. In fact adding that entry did not appear to change the context behavior at all.
+
+I did also try `@newrelic/winston-enricher` to add New Relic context. I learned that it was not necessary to use the enricher since the agent was already adding context. The enricher did have an interesting additional behavior that you might find useful. Along with the message, I was logging additional data in each log entry. The additional data was a JSON stringified version of the additional data object. Without the enricher, log entries show as the message and JSON stringified data as one big string. With the enricher, only the message is left in the New Relic message field. The JSON data is extracted and loaded into additional fields on the New Relic side. I decided I liked the one big string behavior better, so I removed the enricher. But, you might choose differently.
+
+The transport code uses the [JavaScript Standard Style](https://standardjs.com) and may be checked with `npm run lint`.
