@@ -4,7 +4,7 @@ A Winston transport using the New Relic agent. The transport requires your appli
 
 The transport leverages the agent API to send the log messages so it is not necessary to use an http client or set New Relic connection information for the transport. Once your agent is configured and connecting to New Relic, this transport should send logs.
 
-If the New Relic agent is not automatically sending your logs, this transport can help.
+If the New Relic agent is not automatically sending your logs, this transport provides an alternative.
 
 Notable is that the transport allows you to exclude log messages that match configured characteristics. If there are certain types of log messages you wish to exclude from being sent to New Relic, the transport can help with that.
 
@@ -47,7 +47,17 @@ Each item in the array is an object with the following fields:
 `regex`
 : The regex to match against the value indicated by `property`.
 
-For example, a hosting provider was sending 45 health checks a minute to our site. We used the following rejectCriteria to not log these health checks to New Relic:
+The Winston info object includes the data you added using the logger `meta` parameter. For example, if you added a log entry with commands like the following, the headers could be retrieved at `metadata.headers`.
+
+```javascript
+  const meta = {
+    headers: req.headers
+  }
+
+  logger.info(message, meta)
+```
+
+A hosting provider was sending many health checks to our site and we wished to exclude them from the New Relic logs. We used the following rejectCriteria to not log these health checks to New Relic:
 
 ```javascript
   new NewrelicTransport({
@@ -55,7 +65,7 @@ For example, a hosting provider was sending 45 health checks a minute to our sit
     rejectCriteria: [
       {
         property: 'metadata.headers.user-agent',
-        regex: '/^ELB-HealthChecker/g'
+        regex: '^ELB-HealthChecker'
       }
     ]
   })

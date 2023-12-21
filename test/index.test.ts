@@ -182,15 +182,15 @@ describe('NewrelicTransport', () => {
       const message = 'test message'
 
       let rejectCriteria = [
-        { property: null, regex: 'test' },
-        { property: null, regex: 'nomatch' }
+        { property: null, regex: '^test' },
+        { property: null, regex: 'nomatch$' }
       ]
       let result = transport.reject(info, message, rejectCriteria)
       expect(result).to.equal(true)
 
       rejectCriteria = [
-        { property: null, regex: 'nomatch' },
-        { property: null, regex: 'message' }
+        { property: null, regex: '^nomatch' },
+        { property: null, regex: 'message$' }
       ]
       result = transport.reject(info, message, rejectCriteria)
       expect(result).to.equal(true)
@@ -202,15 +202,15 @@ describe('NewrelicTransport', () => {
       const message = ''
 
       let rejectCriteria = [
-        { property: 'property', regex: 'test' },
-        { property: 'property', regex: 'nomatch' }
+        { property: 'property', regex: '^test' },
+        { property: 'property', regex: 'nomatch$' }
       ]
       let result = transport.reject(info, message, rejectCriteria)
       expect(result).to.equal(true)
 
       rejectCriteria = [
-        { property: 'property', regex: 'nomatch' },
-        { property: 'property', regex: 'property' }
+        { property: 'property', regex: '^nomatch' },
+        { property: 'property', regex: 'property$' }
       ]
       result = transport.reject(info, message, rejectCriteria)
       expect(result).to.equal(true)
@@ -222,8 +222,8 @@ describe('NewrelicTransport', () => {
       const message = 'test message'
 
       const rejectCriteria = [
-        { property: null, regex: 'nomatch1' },
-        { property: null, regex: 'nomatch2' }
+        { property: null, regex: '^nomatch1' },
+        { property: null, regex: 'nomatch2$' }
       ]
       const result = transport.reject(info, message, rejectCriteria)
       expect(result).to.equal(false)
@@ -235,8 +235,8 @@ describe('NewrelicTransport', () => {
       const message = ''
 
       const rejectCriteria = [
-        { property: 'property', regex: 'nomatch1' },
-        { property: 'property', regex: 'nomatch2' }
+        { property: 'property', regex: '^nomatch1' },
+        { property: 'property', regex: 'nomatch2$' }
       ]
       const result = transport.reject(info, message, rejectCriteria)
       expect(result).to.equal(false)

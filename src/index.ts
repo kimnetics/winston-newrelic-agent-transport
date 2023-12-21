@@ -60,7 +60,8 @@ export default class NewrelicTransport extends Transport {
         return false
       }
 
-      if (value.match(item.regex) !== null) {
+      const re = new RegExp(item.regex, 'g')
+      if (value.match(re) !== null) {
         return true
       }
     }
