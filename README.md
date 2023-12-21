@@ -33,7 +33,11 @@ export default logger
 
 ### Options
 
-#### rejectCriteria
+#### level (optional)
+
+The Winston logging level to use as the maximum level of messages that the transport will log.
+
+#### rejectCriteria (optional)
 
 The rejectCriteria option allows you to specify an array of regexes that will be matched against either the Winston info object or log message to determine whether or not a log message should be rejected and not logged to New Relic.
 
