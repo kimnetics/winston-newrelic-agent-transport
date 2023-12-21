@@ -1,6 +1,6 @@
 {
   "name": "winston-newrelic-agent-transport",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A Winston transport using the New Relic agent.",
   "type": "module",
   "main": "./dist/index.js",
@@ -9,7 +9,6 @@
   "files": [
     "dist"
   ],
-  "author": "Gregory Kim <gkim@kimnetics.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/kimnetics/winston-newrelic-agent-transport.git"
@@ -49,5 +48,6 @@
     "lint": "eslint . --ext .ts",
     "test": "NEW_RELIC_ENABLED=false mocha"
   },
+  "author": "Gregory Kim <gkim@kimnetics.com>",
   "license": "MIT"
 }
