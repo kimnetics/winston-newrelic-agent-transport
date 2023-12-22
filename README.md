@@ -4,7 +4,7 @@ A Winston transport using the New Relic agent. The transport requires your appli
 
 The transport leverages the agent API to send the log messages so it is not necessary to use an http client or set New Relic connection information for the transport. Once your agent is configured and connecting to New Relic, this transport should send logs.
 
-If the New Relic agent is not automatically sending your logs, this transport provides an alternative.
+The New Relic agent typically automatically sends Winston logs to New Relic when using CommonJS. With CommonJS no additional transport should be needed. However, when using ECMAScript modules, the automatic sending of logs can with certain coding patterns not work. If the New Relic agent is not automatically sending your logs, this transport provides a solution.
 
 Notable is that the transport allows you to exclude log messages that match configured characteristics. If there are certain types of log messages you wish to exclude from being sent to New Relic, the transport can help with that.
 
