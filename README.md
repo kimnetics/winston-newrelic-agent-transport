@@ -79,18 +79,19 @@ A hosting provider was sending many health checks to our site and we wished to e
 
 I found that since this transport is using the agent recordLogEvent method to log events, the agent adds the New Relic context to the log. It is not necessary to add `application_logging.local_decorating.enabled: true` to your New Relic config. Adding that entry did not change the context behavior at all. It is also not necessary to use `@newrelic/winston-enricher`.
 
-To get the metadata information showing at New Relic, I found it is important to put the log entry in JSON format. Here is an example of logger code using this transport:
+To get the metadata information showing at New Relic, I found it is important to put the log entry in JSON format.
 
-```typescript
+Here is an example of logger code using this transport:
+
+```javascript
 import { jsonc } from 'jsonc'
 import { format } from 'logform'
 import winston from 'winston'
 import NewrelicTransport from 'winston-newrelic-agent-transport'
 
-// @ts-expect-error: Convict configuration file.
 import config from '../config.cjs'
 
-let options: winston.LoggerOptions
+let options
 if (config.get('env') === 'development') {
   options = {
     format: format.combine(
