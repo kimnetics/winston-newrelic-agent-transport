@@ -2,9 +2,9 @@
 
 A Winston transport using the New Relic agent. The transport requires your application to be using the New Relic agent.
 
-The transport leverages the agent API to send the log messages so it is not necessary to use an http client or set New Relic connection information for the transport. Once your agent is configured and connecting to New Relic, this transport should send logs.
+The transport leverages the agent API to send log messages so it is not necessary to use an http client or set New Relic connection information for the transport. Once your agent is configured and connecting to New Relic, this transport should send logs.
 
-The New Relic agent typically automatically sends Winston logs to New Relic when using CommonJS. With CommonJS no additional transport should be needed. However, when using ECMAScript modules, the automatic sending of logs can with certain coding patterns not work. If the New Relic agent is not automatically sending your logs, this transport provides a solution.
+The New Relic agent typically automatically forwards Winston logs to New Relic when using CommonJS. With CommonJS no additional transport should be needed. However, when using ECMAScript modules, the automatic forwarding of logs can with certain coding patterns not work. If the New Relic agent is not automatically forwarding your logs, this transport provides a solution.
 
 Notable is that the transport allows you to exclude log messages that match configured characteristics. If there are certain types of log messages you wish to exclude from being sent to New Relic, the transport can help with that.
 
@@ -77,8 +77,60 @@ A hosting provider was sending many health checks to our site and we wished to e
 
 ## Notes
 
-I found that using the agent recordLogEvent method to log events also adds the New Relic context to the log. It is not necessary to add `application_logging.local_decorating.enabled: true` to your New Relic config. In fact adding that entry did not appear to change the context behavior at all.
+I found that since this transport is using the agent recordLogEvent method to log events, the agent adds the New Relic context to the log. It is not necessary to add `application_logging.local_decorating.enabled: true` to your New Relic config. Adding that entry did not change the context behavior at all. It is also not necessary to use `@newrelic/winston-enricher`.
 
-I did also try `@newrelic/winston-enricher` to add New Relic context. I learned that it was not necessary to use the enricher since the agent was already adding context. The enricher did have an interesting additional behavior that you might find useful. Along with the message, I was logging additional data in each log entry. The additional data was a JSON stringified version of the additional data object. Without the enricher, log entries show as the message and JSON stringified data as one big string. With the enricher, only the message is left in the New Relic message field. The JSON data is extracted and loaded into additional fields on the New Relic side. I decided I liked the metadata being placed into separate fields, so I kept the enricher. With separate fields, it makes it easier to query against them. The downside is you need to click into a log entry to see the additional fields in the New Relic Logs UI.
+To get the metadata information showing at New Relic, I found it is important to put the log entry in JSON format. Here is an example of logger code using this transport:
+
+```typescript
+import { jsonc } from 'jsonc'
+import { format } from 'logform'
+import winston from 'winston'
+import NewrelicTransport from 'winston-newrelic-agent-transport'
+
+// @ts-expect-error: Convict configuration file.
+import config from '../config.cjs'
+
+let options: winston.LoggerOptions
+if (config.get('env') === 'development') {
+  options = {
+    format: format.combine(
+      format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
+      format.metadata({ fillExcept: ['level', 'message', 'timestamp'] }),
+      format.align(),
+      format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}${(Object.entries(info.metadata).length > 0) ? ' | ' + jsonc.stringify(info.metadata) : ''}`)
+    ),
+    transports: [
+      new winston.transports.Console({
+        level: 'debug'
+      })
+    ]
+  }
+} else {
+  options = {
+    format: format.combine(
+      format.metadata({ fillExcept: ['level', 'message', 'timestamp'] }),
+      format.json()
+    ),
+    transports: [
+      new winston.transports.Console({
+        level: 'info'
+      }),
+      new NewrelicTransport({
+        level: 'info',
+        rejectCriteria: [
+          {
+            property: 'metadata.headers.user-agent',
+            regex: '^ELB-HealthChecker'
+          }
+        ]
+      })
+    ]
+  }
+}
+
+const logger = winston.createLogger(options)
+
+export default logger
+```
 
 The transport code uses the [JavaScript Standard Style](https://standardjs.com) and may be checked with `npm run lint`.
