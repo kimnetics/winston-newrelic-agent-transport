@@ -1,5 +1,7 @@
 # winston-newrelic-agent-transport
 
+[![Known Vulnerabilities](https://snyk.io/test/github/kimnetics/winston-newrelic-agent-transport/badge.svg)]
+
 A Winston transport using the New Relic agent. The transport requires your application to be using the New Relic agent.
 
 The transport leverages the agent API to send log messages so it is not necessary to use an http client or set New Relic connection information for the transport. Once your agent is configured and connecting to New Relic, this transport should send logs.
