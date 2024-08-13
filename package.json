@@ -1,6 +1,6 @@
 {
   "name": "winston-newrelic-agent-transport",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A Winston transport using the New Relic agent.",
   "type": "module",
   "main": "./dist/index.js",
