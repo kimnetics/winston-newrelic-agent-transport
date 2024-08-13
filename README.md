@@ -1,6 +1,6 @@
 # winston-newrelic-agent-transport
 
-[![Known Vulnerabilities](https://snyk.io/test/github/kimnetics/winston-newrelic-agent-transport/badge.svg)]
+![Known Vulnerabilities](https://snyk.io/test/github/kimnetics/winston-newrelic-agent-transport/badge.svg)
 
 A Winston transport using the New Relic agent. The transport requires your application to be using the New Relic agent.
 
