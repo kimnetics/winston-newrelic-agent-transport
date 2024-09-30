@@ -1,6 +1,6 @@
 {
   "name": "winston-newrelic-agent-transport",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A Winston transport using the New Relic agent.",
   "type": "module",
   "main": "./dist/index.js",
@@ -29,26 +29,26 @@
   },
   "homepage": "https://github.com/kimnetics/winston-newrelic-agent-transport#readme",
   "dependencies": {
-    "newrelic": "10.2.0",
+    "newrelic": "12.5.1",
     "triple-beam": "^1.4.1",
-    "winston-transport": "^4.6.0"
+    "winston-transport": "^4.8.0"
   },
   "devDependencies": {
-    "@types/chai": "^4.3.11",
-    "@types/mocha": "^10.0.6",
+    "@types/chai": "^5.0.0",
+    "@types/mocha": "^10.0.8",
     "@types/newrelic": "^9.14.3",
     "@types/sinon": "^17.0.2",
-    "chai": "^4.3.10",
-    "eslint": "^8.56.0",
+    "chai": "^5.1.1",
+    "eslint": "^8.57.1",
     "eslint-config-standard-with-typescript": "^43.0.0",
-    "eslint-plugin-import": "^2.29.1",
-    "eslint-plugin-n": "^16.5.0",
-    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-import": "^2.30.0",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.6.0",
     "mocha": "^10.2.0",
-    "sinon": "^17.0.1",
+    "sinon": "^19.0.2",
     "ts-node": "^10.9.2",
-    "tsup": "^8.0.1",
-    "typescript": "^5.3.3"
+    "tsup": "^8.3.0",
+    "typescript": "<=5.4.0"
   },
   "scripts": {
     "build": "tsup",

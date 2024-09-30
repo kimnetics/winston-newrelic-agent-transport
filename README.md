@@ -53,11 +53,11 @@ Each item in the array is an object with the following fields:
 `regex`
 : The regex to match against the value indicated by `property`.
 
-The Winston info object includes the data you added using the logger `meta` parameter. For example, if you added a log entry with commands like the following, the headers could be retrieved at `metadata.headers`.
+The Winston info object includes the data you added using the logger `meta` parameter. For example, if you added a log entry with commands like the following, fields added to the locals object could be retrieved at `metadata.locals`.
 
 ```javascript
   const meta = {
-    headers: req.headers
+    locals: res.locals,
   }
 
   logger.info(message, meta)
@@ -83,6 +83,8 @@ I found that since this transport is using the agent recordLogEvent method to lo
 
 To get the metadata information showing at New Relic, I found it is important to put the log entry in JSON format.
 
+A caution is that New Relic starts to show the entry JSON instead of the message if the log entry is too large. When this happens, the entry is also not parsed into its separate fields. The following example shows how to pick the exact fields to send to New Relic to reduce the size of the entry. If I include all of my metadata, the log entry is too large for New Relic. So, I only include the locals object. The locals object is used to record fields like account id that are useful to query against.
+
 Here is an example of logger code using this transport:
 
 ```javascript
@@ -91,41 +93,65 @@ import { format } from 'logform'
 import winston from 'winston'
 import NewrelicTransport from 'winston-newrelic-agent-transport'
 
-import config from '../config.cjs'
+import config from '../config.mjs'
+import { ENV_DEVELOPMENT } from '../utils/constant.js'
 
-let options
-if (config.get('env') === 'development') {
+const LOG_LEVEL_DEBUG = 'debug'
+const LOG_LEVEL_INFO = 'info'
+
+// New Relic does not like log entries that are too large. Thus, keep fields to a minimum.
+const newrelicFormat = format((info) => {
+  return {
+    level: info.level,
+    timestamp: info.timestamp,
+    message: info.message,
+    metadata: {
+      locals: info.metadata?.locals
+    }
+  };
+})();
+
+let options: winston.LoggerOptions
+if (config.get('env') === ENV_DEVELOPMENT) {
   options = {
-    format: format.combine(
-      format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
-      format.metadata({ fillExcept: ['level', 'message', 'timestamp'] }),
-      format.align(),
-      format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}${(Object.entries(info.metadata).length > 0) ? ' | ' + jsonc.stringify(info.metadata) : ''}`)
-    ),
     transports: [
       new winston.transports.Console({
-        level: 'debug'
+        level: LOG_LEVEL_DEBUG,
+        format: format.combine(
+          format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
+          format.metadata({ key: 'metadata', fillExcept: ['level', 'message', 'timestamp'] }),
+          format.align(),
+          format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}${(Object.entries(info.metadata).length > 0) ? ' | ' + jsonc.stringify(info.metadata) : ''}`)
+        ),
       })
     ]
   }
 } else {
   options = {
-    format: format.combine(
-      format.metadata({ fillExcept: ['level', 'message', 'timestamp'] }),
-      format.json()
-    ),
     transports: [
       new winston.transports.Console({
-        level: 'info'
+        level: LOG_LEVEL_INFO,
+        format: format.combine(
+          format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
+          format.metadata({ key: 'metadata', fillExcept: ['level', 'message', 'timestamp'] }),
+          format.align(),
+          format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}${(Object.entries(info.metadata).length > 0) ? ' | ' + jsonc.stringify(info.metadata) : ''}`)
+        ),
       }),
       new NewrelicTransport({
-        level: 'info',
+        level: LOG_LEVEL_INFO,
         rejectCriteria: [
           {
             property: 'metadata.headers.user-agent',
             regex: '^ELB-HealthChecker'
           }
-        ]
+        ],
+        format: format.combine(
+          format.timestamp(),
+          format.metadata({ key: 'metadata', fillExcept: ['level', 'message', 'timestamp'] }),
+          newrelicFormat,
+          format.json(),
+        )
       })
     ]
   }
