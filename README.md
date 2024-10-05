@@ -108,8 +108,8 @@ const newrelicFormat = format((info) => {
     metadata: {
       locals: info.metadata?.locals
     }
-  };
-})();
+  }
+})()
 
 let options: winston.LoggerOptions
 if (config.get('env') === ENV_DEVELOPMENT) {
@@ -122,7 +122,7 @@ if (config.get('env') === ENV_DEVELOPMENT) {
           format.metadata({ key: 'metadata', fillExcept: ['level', 'message', 'timestamp'] }),
           format.align(),
           format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}${(Object.entries(info.metadata).length > 0) ? ' | ' + jsonc.stringify(info.metadata) : ''}`)
-        ),
+        )
       })
     ]
   }
@@ -136,7 +136,7 @@ if (config.get('env') === ENV_DEVELOPMENT) {
           format.metadata({ key: 'metadata', fillExcept: ['level', 'message', 'timestamp'] }),
           format.align(),
           format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}${(Object.entries(info.metadata).length > 0) ? ' | ' + jsonc.stringify(info.metadata) : ''}`)
-        ),
+        )
       }),
       new NewrelicTransport({
         level: LOG_LEVEL_INFO,
@@ -150,7 +150,7 @@ if (config.get('env') === ENV_DEVELOPMENT) {
           format.timestamp(),
           format.metadata({ key: 'metadata', fillExcept: ['level', 'message', 'timestamp'] }),
           newrelicFormat,
-          format.json(),
+          format.json()
         )
       })
     ]
