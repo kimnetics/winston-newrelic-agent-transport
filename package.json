@@ -31,7 +31,7 @@
   "dependencies": {
     "newrelic": "12.5.1",
     "triple-beam": "^1.4.1",
-    "winston-transport": "^4.8.0"
+    "winston-transport": "^4.9.0"
   },
   "devDependencies": {
     "@types/chai": "^5.0.0",
