@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/kimnetics/winston-newrelic-agent-transport#readme",
   "dependencies": {
-    "newrelic": "12.5.1",
+    "newrelic": "12.12.0",
     "triple-beam": "^1.4.1",
     "winston-transport": "^4.8.0"
   },
