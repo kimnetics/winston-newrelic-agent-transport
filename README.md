@@ -87,9 +87,11 @@ A caution is that New Relic starts to show the entry JSON instead of the message
 
 The transport code uses the [JavaScript Standard Style](https://standardjs.com) and may be checked with `npm run lint`.
 
-## Example Logger
+## Logging Example
 
-Here is an example of logger code using this transport:
+### Winston Logger
+
+Here is an example of Winston logger code using this transport:
 
 ```javascript
 import { jsonc } from 'jsonc'
@@ -192,7 +194,51 @@ const logger = winston.createLogger(options)
 export default logger
 ```
 
-The example logger code is used to produce a lean log entry in the New Relic Logs list that looks like this:
+### Express Logging Middleware
+
+Here is an example of [Express](https://expressjs.com/) logging middleware using the above logger:
+
+```javascript
+// Log requests.
+const log = (req: Request, res: Response): void => {
+  const ipAddress = req.headers['x-forwarded-for'] as string ?? req.ip
+  const message = `Request | ${ipAddress} ${req.method} ${req.originalUrl} ${res.statusCode}`
+
+  // Do not show bearer token.
+  if ((req.headers.authorization !== undefined) && (req.headers.authorization.startsWith('Bearer'))) {
+    req.headers.authorization = 'Bearer [REDACTED]'
+  }
+
+  const meta = {
+    locals: res.locals,
+    headers: req.headers,
+    httpVersion: req.httpVersion
+  }
+
+  switch (res.statusCode.toString().charAt(0)) {
+    case '4':
+      logger.warn(message, meta)
+      break
+    case '5':
+      logger.error(message, meta)
+      break
+    default:
+      logger.info(message, meta)
+  }
+}
+app.use((req: Request, res: Response, next: NextFunction) => {
+  onFinished(res, (_err, res: Response) => {
+    log(req, res)
+  })
+  next()
+})
+```
+
+The code is using [on-finished](https://www.npmjs.com/package/on-finished) to allow logging after the response has been sent. This allows access to the full range of response information.
+
+### New Relic Output
+
+The above code produces a lean log entry in the New Relic Logs list that looks like this:
 </br>
 </br>
 <img src="README-log-entry.png">
