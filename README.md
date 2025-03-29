@@ -85,6 +85,10 @@ To get the metadata information showing at New Relic, I found it is important to
 
 A caution is that New Relic starts to show the entry JSON instead of the message if the log entry is too large. When this happens, the entry is also not parsed into its separate fields. The following example shows how to pick the exact fields to send to New Relic to reduce the size of the entry. If I include all of my metadata, the log entry is too large for New Relic. So, I only include a few selected properties like the locals object. The locals object is used to record fields like user id that are useful to query against.
 
+The transport code uses the [JavaScript Standard Style](https://standardjs.com) and may be checked with `npm run lint`.
+
+## Example Logger
+
 Here is an example of logger code using this transport:
 
 ```javascript
@@ -199,5 +203,3 @@ Clicking on the log entry displays Log details that look like this:
 <img src="README-log-details.png">
 
 The Log details include the custom fields added to the locals object. Notable is those custom fields can be used in NRQL queries.
-
-The transport code uses the [JavaScript Standard Style](https://standardjs.com) and may be checked with `npm run lint`.
