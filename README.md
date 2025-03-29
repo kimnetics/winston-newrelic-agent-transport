@@ -188,7 +188,7 @@ const logger = winston.createLogger(options)
 export default logger
 ```
 
-The example logger code produces a lean log entry in the New Relic Logs list that looks like this:
+The example logger code is used to produce a lean log entry in the New Relic Logs list that looks like this:
 </br>
 </br>
 <img src="README-log-entry.png">
@@ -198,6 +198,6 @@ Clicking on the log entry displays Log details that look like this:
 </br>
 <img src="README-log-details.png">
 
-The Log details include the custom fields added to the locals object. Notable is those fields can be used in NRQL queries.
+The Log details include the custom fields added to the locals object. Notable is those custom fields can be used in NRQL queries.
 
 The transport code uses the [JavaScript Standard Style](https://standardjs.com) and may be checked with `npm run lint`.
