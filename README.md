@@ -93,26 +93,42 @@ import { format } from 'logform'
 import winston from 'winston'
 import NewrelicTransport from 'winston-newrelic-agent-transport'
 
-import config from '../config.mjs'
-import { ENV_DEVELOPMENT } from '../utils/constant.js'
+import config from '../config.js'
 
 const LOG_LEVEL_DEBUG = 'debug'
 const LOG_LEVEL_INFO = 'info'
 
 // New Relic does not like log entries that are too large. Thus, keep fields to a minimum.
 const newrelicFormat = format((info) => {
-  return {
-    level: info.level,
-    timestamp: info.timestamp,
-    message: info.message,
+  const nrFormat: {
+    level: string
+    timestamp: string
+    message: string
     metadata: {
-      locals: info.metadata?.locals
+      locals?: object
+      httpVersion?: string
+    }
+  } = {
+    level: info.level,
+    timestamp: typeof info.timestamp === 'string' ? info.timestamp : '',
+    message: typeof info.message === 'string' ? info.message : '',
+    metadata: {}
+  }
+
+  if ('metadata' in info && typeof info.metadata === 'object' && info.metadata !== null) {
+    if ('locals' in info.metadata && typeof info.metadata.locals === 'object' && info.metadata.locals !== null) {
+      nrFormat.metadata.locals = info.metadata.locals
+    }
+    if ('httpVersion' in info.metadata && typeof info.metadata.httpVersion === 'string') {
+      nrFormat.metadata.httpVersion = info.metadata.httpVersion
     }
   }
+
+  return nrFormat
 })()
 
 let options: winston.LoggerOptions
-if (config.get('env') === ENV_DEVELOPMENT) {
+if (config.get('runningLocal')) {
   options = {
     transports: [
       new winston.transports.Console({
@@ -121,7 +137,12 @@ if (config.get('env') === ENV_DEVELOPMENT) {
           format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
           format.metadata({ key: 'metadata', fillExcept: ['level', 'message', 'timestamp'] }),
           format.align(),
-          format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}${(Object.entries(info.metadata).length > 0) ? ' | ' + jsonc.stringify(info.metadata) : ''}`)
+          format.printf((info) => {
+            const timestamp = typeof info.timestamp === 'string' ? info.timestamp : ''
+            const message = typeof info.message === 'string' ? info.message : ''
+            const metadata = info.metadata as object
+            return `${timestamp} ${info.level}: ${message}${(Object.entries(metadata).length > 0) ? ' | ' + jsonc.stringify(info.metadata) : ''}`
+          })
         )
       })
     ]
@@ -135,7 +156,12 @@ if (config.get('env') === ENV_DEVELOPMENT) {
           format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss.SSS' }),
           format.metadata({ key: 'metadata', fillExcept: ['level', 'message', 'timestamp'] }),
           format.align(),
-          format.printf((info) => `${info.timestamp} ${info.level}: ${info.message}${(Object.entries(info.metadata).length > 0) ? ' | ' + jsonc.stringify(info.metadata) : ''}`)
+          format.printf((info) => {
+            const timestamp = typeof info.timestamp === 'string' ? info.timestamp : ''
+            const message = typeof info.message === 'string' ? info.message : ''
+            const metadata = info.metadata as object
+            return `${timestamp} ${info.level}: ${message}${(Object.entries(metadata).length > 0) ? ' | ' + jsonc.stringify(info.metadata) : ''}`
+          })
         )
       }),
       new NewrelicTransport({
@@ -161,5 +187,15 @@ const logger = winston.createLogger(options)
 
 export default logger
 ```
+
+The example logger code produces a lean log entry in the New Relic Logs list that looks like this:
+</br>
+<img src="README-log-entry.png">
+
+Clicking on the log entry displays Log details that look like this:
+</br>
+<img src="README-log-details.png">
+
+The Log details include the custom fields added to the locals object. Notable is those fields can be used in NRQL queries.
 
 The transport code uses the [JavaScript Standard Style](https://standardjs.com) and may be checked with `npm run lint`.
