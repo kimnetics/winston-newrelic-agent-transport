@@ -190,9 +190,11 @@ export default logger
 
 The example logger code produces a lean log entry in the New Relic Logs list that looks like this:
 </br>
+</br>
 <img src="README-log-entry.png">
 
 Clicking on the log entry displays Log details that look like this:
+</br>
 </br>
 <img src="README-log-details.png">
 
