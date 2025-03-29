@@ -83,7 +83,7 @@ I found that since this transport is using the agent recordLogEvent method to lo
 
 To get the metadata information showing at New Relic, I found it is important to put the log entry in JSON format.
 
-A caution is that New Relic starts to show the entry JSON instead of the message if the log entry is too large. When this happens, the entry is also not parsed into its separate fields. The following example shows how to pick the exact fields to send to New Relic to reduce the size of the entry. If I include all of my metadata, the log entry is too large for New Relic. So, I only include the locals object. The locals object is used to record fields like account id that are useful to query against.
+A caution is that New Relic starts to show the entry JSON instead of the message if the log entry is too large. When this happens, the entry is also not parsed into its separate fields. The following example shows how to pick the exact fields to send to New Relic to reduce the size of the entry. If I include all of my metadata, the log entry is too large for New Relic. So, I only include a few selected properties like the locals object. The locals object is used to record fields like user id that are useful to query against.
 
 Here is an example of logger code using this transport:
 
