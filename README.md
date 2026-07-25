@@ -10,6 +10,12 @@ The New Relic agent typically automatically forwards Winston logs to New Relic w
 
 Notable is that the transport allows you to exclude log messages that match configured characteristics. If there are certain types of log messages you wish to exclude from being sent to New Relic, the transport can help with that.
 
+## Requirements
+
+Node.js 22 or later.
+
+Version 2.0.0 uses version 14 of the New Relic agent, which dropped support for Node.js 20. If you need to run on an older version of Node.js, version 1.0.11 of this transport uses version 12 of the agent, which supports Node.js 18 or later.
+
 ## Installation
 
 ```sh
