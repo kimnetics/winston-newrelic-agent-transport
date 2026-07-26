@@ -6,9 +6,9 @@ A Winston transport using the New Relic agent. The transport requires your appli
 
 The transport leverages the agent API to send log messages so it is not necessary to use an http client or set New Relic connection information for the transport. Once your agent is configured and connecting to New Relic, this transport should send logs.
 
-The New Relic agent typically automatically forwards Winston logs to New Relic when using CommonJS. With CommonJS no additional transport should be needed. However, when using ECMAScript modules, the automatic forwarding of logs can with certain coding patterns not work. If the New Relic agent is not automatically forwarding your logs, this transport provides a solution.
+The transport allows you to exclude log messages that match configured characteristics. If there are certain types of log messages you wish to keep out of New Relic, such as health checks, the transport can help with that. See [rejectCriteria](#rejectcriteria-optional) for how to configure the exclusions, and [Agent Log Forwarding](#agent-log-forwarding) for a setting you likely need to change so that the agent does not forward the messages you excluded.
 
-Notable is that the transport allows you to exclude log messages that match configured characteristics. If there are certain types of log messages you wish to exclude from being sent to New Relic, the transport can help with that.
+The New Relic agent also forwards Winston logs on its own. When I wrote this transport, that automatic forwarding did not happen in ECMAScript Module applications unless the agent was loaded with its experimental ESM loader, and this transport was a way to get logs to New Relic without using the loader. Recent agent versions handle ECMAScript Modules without it, so you may find the agent is already forwarding your logs. This transport remains useful when you want control over which messages are sent.
 
 ## Requirements
 
@@ -59,6 +59,12 @@ Each item in the array is an object with the following fields:
 `regex`
 : The regex to match against the value indicated by `property`.
 
+A `property` can use dot notation or bracket notation to reach a nested value, such as `metadata.headers.user-agent` or `metadata.headers['user-agent']`. Use quoted bracket notation when a key contains a dot, as in `metadata['error.message']`, so that the key is not treated as two levels. Only quoting has that effect: an unquoted `metadata[error.message]` is the same as `metadata.error.message`.
+
+Every item in the array is checked. If the `property` for an item is missing from a given log entry, or holds a value that is not a string, that item is skipped and the remaining items are still checked. This matters when a criterion points at a property that only some log entries have, such as a request header.
+
+The regexes are compiled when the transport is constructed. An invalid regex throws at that point, so a mistake in the criteria is reported when your logger is created rather than going unnoticed. If checking the criteria fails at log time for any other reason, the log message is sent to New Relic rather than dropped.
+
 The Winston info object includes the data you added using the logger `meta` parameter. For example, if you added a log entry with commands like the following, fields added to the locals object could be retrieved at `metadata.locals`.
 
 ```javascript
@@ -82,6 +88,33 @@ A hosting provider was sending many health checks to our site and we wished to e
     ]
   })
 ```
+
+## Agent Log Forwarding
+
+The New Relic agent has its own Winston support. When agent log forwarding is enabled, which is the default, the agent adds a transport named `newrelic` to each Winston logger you create and forwards every log entry through it. This happens even when using ECMAScript modules.
+
+That transport does not know about your rejectCriteria, so the entries you meant to exclude are still sent to New Relic. The entries you did not exclude are sent twice, once by each transport. The two copies do not look alike, because the agent sends the Winston log line as it stands while this transport sends what your format chain produced, so the duplication is not always obvious.
+
+You can see whether the agent added its transport by listing the transports on your logger:
+
+```javascript
+console.log(logger.transports.map((transport) => transport.name))
+// [ 'console', 'winston-newrelic-agent-transport', 'newrelic' ]
+```
+
+To leave log forwarding to this transport, turn off the agent Winston instrumentation in your New Relic config:
+
+```javascript
+exports.config = {
+  instrumentation: {
+    winston: {
+      enabled: false
+    }
+  }
+}
+```
+
+Do not use `application_logging.forwarding.enabled` for this. That flag also gates the agent `recordLogEvent` method this transport calls, so turning it off stops this transport from sending anything to New Relic.
 
 ## Notes
 
