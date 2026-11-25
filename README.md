@@ -14,12 +14,14 @@ The New Relic agent also forwards Winston logs on its own. When I wrote this tra
 
 Node.js 22 or later.
 
-Version 2.0.0 uses version 14 of the New Relic agent, which dropped support for Node.js 20. If you need to run on an older version of Node.js, version 1.0.11 of this transport uses version 12 of the agent, which supports Node.js 18 or later.
+New Relic agent 14.3.3 or later, installed by your application. From version 2.2.0 the agent is a peer dependency, so the transport uses the same copy of the agent your application loads instead of installing one of its own. Versions 2.0.0 to 2.1.0 depended on one exact agent version, which put a second copy of the agent in applications that used a different one.
+
+Version 14 of the agent dropped support for Node.js 20. If you need to run on an older version of Node.js, version 1.0.11 of this transport uses version 12 of the agent, which supports Node.js 18 or later.
 
 ## Installation
 
 ```sh
-npm install --save winston-newrelic-agent-transport
+npm install --save newrelic winston-newrelic-agent-transport
 ```
 
 ## Usage
